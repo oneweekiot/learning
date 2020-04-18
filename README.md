@@ -13,106 +13,94 @@ You should have the following ready before beginning:
 
 -   [XC16 Compiler v1.50 or later](https://www.microchip.com/mplab/compilers)
 
--   MPLAB code configurator (Tools > Plugin Download > search for MPLAB code configurator)
-
-code-configurator.png
+-   MPLAB code configurator (Once you finish the installation of the previous items, open the MPLAB X IDE, then click Tools > Plugin Download > search for MPLAB code configurator)
 
 ![code-configurator](code-configurator.png)
 
--   Install the Azure IoT C SDK libraries by one of two options:
-	1. Generate the Libraries by executing the [`make_sdk.py`](https://github.com/Azure/azure-iot-pal-arduino/blob/master/build_all/make_sdk.py) script within the `build_all` folder, E.x.: `python3 make_sdk.py -o <your-output-folder>`
-	- Note: this is also currently the ONLY way to build the `AzureIoTSocket_WiFi` library for using the esp32.
-	
-	2. Install the following libraries through the Arduino IDE Library Manager:
-	-   `AzureIoTHub`, `AzureIoTUtility`, `AzureIoTProtocol_MQTT`, `AzureIoTProtocol_HTTP`
-	
-# Simple Sample Instructions
+# Sample Instructions
 
-## ESP8266
+## Get the files
 
-##### Sparkfun Thing, Adafruit Feather Huzzah, or generic ESP8266 board
+1. Get the sample from GitHub: [Link ot Eric's GitHub repo](https://garage-06.visualstudio.com/MicrochipIoT%202027%2088114/_git/PIC_IoT?version=GBmaster)
 
-1. Install esp8266 board support into your Arduino IDE.
+2. Open the project in MPLAB X: File > Open Project > select the folder in which you just downloaded the files
 
-    - Start Arduino and open Preferences window.
+## Get the Device ID (cumbersome version)
 
-    - Enter `http://arduino.esp8266.com/stable/package_esp8266com_index.json` into Additional Board Manager URLs field. You can add multiple URLs, separating them with commas.
+1. On the left hand panel, look for Source files > MCC Generated Files > cloud > mqtt_packetPopulate.c 
 
-    - Open Boards Manager from Tools > Board menu and install esp8266 platform 2.5.2 or later
+![packet-populate](packet-populate-file1.png)
 
-    - Select your ESP8266 board from Tools > Board menu after installation
+2. Add a breakpoint on line 139
+3. Enable the file Registry view by clicking on Window > Target Memory Views > File Registers
+4. Right click on the memory panel and select One byte view
 
-2. Open the `iothub_ll_telemetry_sample` example from the Arduino IDE File->Examples->AzureIoTHub menu.
+![one-byte-view.png](one-byte-view.png)
 
-3. Update Wifi SSID/Password in `iot_configs.h`
+5. Click on debug project icon and wait until the breakpoint gets activated (you'll know the debugging is ready when the line 139 gets green.
 
-    - Ensure you are using a wifi network that does not require additional manual steps after connection, such as opening a web browser.
+![upload.png](upload.png)
 
-4. Update IoT Hub Connection string in `iot_configs.h`
+6. On the file register window, click the blue arrow pointing down, and enter 0x24bc on the enter Hex Address field, then click Go To.
 
-5. Navigate to where your esp8266 board package is located, typically in `C:\Users\<your username>\AppData\Local\Arduino15\packages` on Windows and `~/.arduino15/packages/` on Linux
-	
-- Locate the board's `Arduino.h` (`hardware/esp8266/<board package version>/cores/esp8266/` and comment out the line containing `#define round(x)`, around line 137.
+![debug-1.png](debug-1.png)
 
-- Two folders up from the `Arduino.h` step above, in the same folder as the board's `platform.txt`, paste the [`platform.local.txt`](https://github.com/Azure/azure-iot-arduino/blob/master/examples/iothub_ll_telemetry_sample/esp8266/platform.local.txt) file from the `esp8266` folder in the sample into it.
+7. The device ID we need is shown as in the picture below. Select both lines, copy its content, paste it on Notepad so you can get rid of the points, the spaces and to make it a single line.
 
-	- Note1: It is necessary to add `-DDONT_USE_UPLOADTOBLOB` and `-DUSE_BALTIMORE_CERT` to `build.extra_flags=` in a `platform.txt` in order to run the sample, however, you can define them in your own `platform.txt` or a `platform.local.txt` of your own creation. 
-	
-	- Note2: If your device is not intended to connect to the global portal.azure.com, please change the CERT define to the appropriate cert define as laid out in [`certs.c`](https://github.com/Azure/azure-iot-sdk-c/blob/master/certs/certs.c)
-	
-	- Note3: Due to RAM limits, you must select just one CERT define.
+![debug-2.png](debug-2.png)
 
-6. Run the sample.
-	
-7. Access the [SparkFun Get Started](https://azure.microsoft.com/en-us/documentation/samples/iot-hub-c-thingdev-getstartedkit/) tutorial to learn more about Microsoft Sparkfun Dev Kit.
+![debug-3.png](debug-3.png)
 
-8. Access the [Huzzah Get Started](https://azure.microsoft.com/en-us/documentation/samples/iot-hub-c-huzzah-getstartedkit/) tutorial to learn more about Microsoft Huzzah Dev Kit.
+8. Create a new Device on your IoT Hub, and its name should be exactly like the Device ID you got in this step:
 
-## ESP32
+![deviceid.png](deviceid.png)
 
-##### Sparkfun ESP32 Thing, Adafruit ESP32 Feather, or generic ESP32 board
+## Running the Sample
 
-1. Install esp32 board support into your Arduino IDE.
+1. Let's update the Wi-Fi credentials and security: on the left hand panel, look for Header files > MCC Generated Files > config > config_winc.h
 
-    - Start Arduino and open Preferences window.
+![conf-winc.png](conf-winc.png)
 
-    - Enter `https://dl.espressif.com/dl/package_esp32_index.json` into Additional Board Manager URLs field. You can add multiple URLs, separating them with commas.
+- 	Update your SSID on line 24
+-   Update your Password on line 39
+-   On line 34 you should have the definition for your Wi-Fi security (Most home routers use M2M_WIFI_SEC_WPA_PSK, and if that's your case you should see line 34 like in the picture below.)
 
-    - Open Boards Manager from Tools > Board menu and install esp32 platform 1.0.2 or later
+    ![wifi-security.png](wifi-security.png)
+ 
+2. Update the device key:  on the left hand panel, look for Header files > MCC Generated Files > cloud > mqtt_packetPopulate.f
 
-    - Select your ESP32 board from Tools > Board menu after installation
+![packet-populate-file1.png](packet-populate-file1.png)
 
-2. Open the `iothub_ll_telemetry_sample` example from the Arduino IDE File->Examples->AzureIoTHub menu.
+- On line 46 replace the "XXXXXXXXX" for your device key from IoT Hub
 
-3. Update Wifi SSID/Password in `iot_configs.h`
+![device-ID.png](device-ID.png)
 
-- Ensure you are using a wifi network that does not require additional manual steps after connection, such as opening a web browser.
+3. Update the hub connection string:  on the left hand panel, look for Header files > MCC Generated Files > config> IoT_sensor_Node_config.h
 
-4. Update IoT Hub Connection string in `iot_configs.h`
+- On line 23 replace the content for your device key from IoT Hub
 
-5. Navigate to where your esp32 board package is located, typically in `C:\Users\<your username>\AppData\Local\Arduino15\packages` on Windows and `~/.arduino15/packages/` on Linux
+![hub-id.png](hub-id.png)
 
-	- Navigate deeper in to `hardware/esp8266/<board package version>/` where the `platform.txt` file lives.
-	
-	- Copy the [`platform.local.txt`](https://github.com/Azure/azure-iot-arduino/blob/master/examples/iothub_ll_telemetry_sample/esp32/platform.local.txt) file from the `esp32` folder in the sample into the same folder as the `platform.txt`.
-	
-	- Alternatively, or for later versions of the Board Package, add the define `-DDONT_USE_UPLOADTOBLOB` to `build.extra_flags=` in `platform.txt` or a `platform.local.txt` that you create.
-	
-6. Run the sample.
-	
-7. Access the [SparkFun Get Started](https://azure.microsoft.com/en-us/documentation/samples/iot-hub-c-thingdev-getstartedkit/) tutorial to learn more about Microsoft Sparkfun Dev Kit.
+- Note: you don't need the whole connection string, you only need the host name. 
+- In the example connection string below, the highlighted is the part you need to update on line 23. 
 
-8. Access the [Huzzah Get Started](https://azure.microsoft.com/en-us/documentation/samples/iot-hub-c-huzzah-getstartedkit/) tutorial to learn more about Microsoft Huzzah Dev Kit.
+HostName=**ps-demo-hub.azure-devices.net**;DeviceId=Pic_test_2;SharedAccessKey=PsPq+m3gtcvYs=
 
-## License
+3. Once you have all the credentials set, you can upload the code to your device, by clicking on debug project.
 
-See [LICENSE](LICENSE) file.
+- If everything goes well, you should see the onboard LEDs turning on. The blue and the green LEDs will be on all the time and the yellow one blinks every 5 seconds to confirm the telemetry has been sent to Azure.
 
+![upload.png](upload.png)
 
-[azure-certifiedforiot]:  http://azure.com/certifiedforiot
+## Calling a direct method on the device
 
-[Microsoft-Azure-Certified-Badge]: images/Microsoft-Azure-Certified-150x150.png (Microsoft Azure Certified)
+1. On your device window on Azure, click Direct Method
 
-Complete information for contributing to the Azure IoT Arduino libraries
+![direct-method-1.png](direct-method-1.png)
 
-can be found [here](https://github.com/Azure/azure-iot-pal-arduino).
+2. On the direct method window, type blink on the Method Name, type {"duration":3}  on the payload, and click "Invoke method". 
+
+![direct-method-2.png](direct-method-2.png)
+
+3. You should see the red LED turning on for 3 seconds and then turning back off again.
+
