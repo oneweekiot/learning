@@ -21,7 +21,7 @@ You should have the following ready before beginning:
 
 ## Get the files
 
-1. Get the sample from GitHub: [Link ot Eric's GitHub repo](https://garage-06.visualstudio.com/MicrochipIoT%202027%2088114/_git/PIC_IoT?version=GBmaster)
+1. Get the sample from GitHub: [Link to Eric's GitHub repo](https://garage-06.visualstudio.com/MicrochipIoT%202027%2088114/_git/PIC_IoT?version=GBmaster)
 
 2. Open the project in MPLAB X: File > Open Project > select the folder in which you just downloaded the files
 
